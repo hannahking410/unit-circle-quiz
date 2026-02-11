@@ -1,11 +1,11 @@
 {
   "name": "Unit Circle Quiz",
   "short_name": "Unit Circle",
-  //"description": "Description of my app",
+  "description": "unit circle quiz",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff5f7",
-  "theme_color": "#000000",
+  "theme_color": "#ff9cc5",
   "orientation": "portrait",
   "icons": [
     {
