@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Icon Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #ff6b9d; }
+    h2 { color: #0D3B66; margin-top: 0; }
+    .status { 
+      padding: 10px; 
+      border-radius: 5px; 
+      margin: 10px 0;
+    }
+    .success { background: #e8f9f0; color: #2d8659; }
+    .error { background: #ffe8ec; color: #d94a6e; }
+    img { 
+      border: 2px solid #ffc0d3; 
+      border-radius: 10px;
+      margin: 10px;
+    }
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 PWA Icon Diagnostic Tool</h1>
+  
+  <div class="test-section">
+    <h2>1. Testing Icon Files</h2>
+    <p>Trying to load your icons...</p>
+    
+    <div>
+      <strong>icon-192.png:</strong>
+      <img src="/icon-192.png" width="100" onerror="this.style.display='none'; document.getElementById('icon192-error').style.display='block';">
+      <div id="icon192-error" class="status error" style="display:none;">
+        ❌ Failed to load /icon-192.png - File might not exist or wrong path
+      </div>
+    </div>
+    
+    <div>
+      <strong>icon-512.png:</strong>
+      <img src="/icon-512.png" width="100" onerror="this.style.display='none'; document.getElementById('icon512-error').style.display='block';">
+      <div id="icon512-error" class="status error" style="display:none;">
+        ❌ Failed to load /icon-512.png - File might not exist or wrong path
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>2. Testing Manifest File</h2>
+    <div id="manifest-status">Checking manifest.json...</div>
+  </div>
+
+  <div class="test-section">
+    <h2>3. Current File Paths</h2>
+    <p>Your manifest.json should reference:</p>
+    <ul>
+      <li><code>"src": "/icon-192.png"</code></li>
+      <li><code>"src": "/icon-512.png"</code></li>
+    </ul>
+    <p><strong>Current URL:</strong> <code id="current-url"></code></p>
+  </div>
+
+  <div class="test-section">
+    <h2>4. What to Check</h2>
+    <ol>
+      <li>Are both icon images showing above? If not, files aren't in the right place.</li>
+      <li>Is the manifest loading correctly below?</li>
+      <li>Are the file paths in manifest.json correct?</li>
+    </ol>
+  </div>
+
+  <script>
+    // Display current URL
+    document.getElementById('current-url').textContent = window.location.href;
+
+    // Test manifest.json loading
+    fetch('/manifest.json')
+      .then(response => {
+        if (!response.ok) throw new Error('Manifest not found');
+        return response.json();
+      })
+      .then(manifest => {
+        document.getElementById('manifest-status').innerHTML = `
+          <div class="status success">
+            ✓ Manifest loaded successfully!<br>
+            <strong>Name:</strong> ${manifest.name}<br>
+            <strong>Short name:</strong> ${manifest.short_name}<br>
+            <strong>Theme color:</strong> ${manifest.theme_color}<br>
+            <strong>Icon paths:</strong><br>
+            ${manifest.icons.map(icon => `- ${icon.src} (${icon.sizes})`).join('<br>')}
+          </div>
+        `;
+      })
+      .catch(error => {
+        document.getElementById('manifest-status').innerHTML = `
+          <div class="status error">
+            ❌ Failed to load manifest.json<br>
+            Error: ${error.message}
+          </div>
+        `;
+      });
+  </script>
+</body>
+</html>
