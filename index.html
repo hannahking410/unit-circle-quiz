@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Unit Circle Quiz</title>
+  
+  <!-- PWA Setup -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ff9cc5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Unit Circle">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -167,7 +176,6 @@
         <div className="quiz-container">
           <style>{`
             @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
-</style>);
             
             * {
               box-sizing: border-box;
@@ -179,22 +187,31 @@
               margin: 0;
               padding: 0;
               overflow-x: hidden;
+              /* Prevent rubber-band scrolling on mobile */
+              position: fixed;
+              width: 100%;
+              height: 100%;
+            }
+            
+            #root {
+              width: 100%;
+              height: 100%;
+              overflow-y: auto;
+              -webkit-overflow-scrolling: touch;
             }
             
             .quiz-container {
               min-height: 100vh;
-              
               background: linear-gradient(135deg, #fff5f7 0%, #ffe8ec 50%, #ffd4dc 100%); 
-
               color: #5a4a4f;
               font-family: 'Lora', sans-serif;
               padding: 20px;
+              padding-bottom: 40px; /* Extra padding at bottom for mobile keyboards */
               position: relative;
               overflow: hidden;
             }
             
             .quiz-container::before {
-            
               position: fixed;
               top: 20px;
               left: 0;
@@ -230,7 +247,6 @@
               font-weight: 700;
               color: #0D3B66;
               margin-bottom: 10px;
-              <!-- animation: float 3s ease-in-out infinite; -->
             }
             
             .subtitle {
@@ -305,6 +321,7 @@
               to { opacity: 1; transform: translateY(0); }
             }
             
+            /* FIXED: Progress bar with better mobile sizing */
             .progress-bar {
               background: white;
               border: 3px solid #ffc0d3;
@@ -324,8 +341,10 @@
               align-items: center;
               justify-content: center;
               font-weight: 700;
-              font-size: 1rem;
+              font-size: clamp(0.85rem, 3.5vw, 1rem); /* FIXED: Smaller minimum size */
               color: white;
+              padding: 0 10px; /* FIXED: Add padding so text doesn't touch edges */
+              min-width: 60px; /* FIXED: Ensure progress bar is wide enough for text */
             }
             
             .question-card {
@@ -335,6 +354,9 @@
               padding: 40px;
               margin-bottom: 30px;
               box-shadow: 0 8px 25px rgba(255, 107, 157, 0.15);
+              display: flex;
+              flex-direction: column;
+              align-items: center; /* FIXED: Center all content */
             }
             
             .unit-circle-svg {
@@ -357,8 +379,11 @@
             
             .input-group {
               margin-bottom: 20px;
+              width: 100%; /* FIXED: Full width container */
+              max-width: 400px; /* FIXED: Limit maximum width */
             }
             
+            /* FIXED: Centered answer input */
             .answer-input {
               width: 100%;
               padding: 18px 24px;
@@ -388,6 +413,8 @@
               display: flex;
               gap: 15px;
               flex-wrap: wrap;
+              width: 100%; /* FIXED: Full width */
+              justify-content: center; /* FIXED: Center buttons */
             }
             
             .btn {
@@ -459,12 +486,15 @@
             
             .feedback {
               margin-top: 20px;
+              margin-bottom: 20px; /* FIXED: Add bottom margin */
               padding: 20px;
               border-radius: 16px;
               text-align: center;
               font-size: clamp(1rem, 3vw, 1.1rem);
               animation: slideIn 0.3s ease;
               font-weight: 600;
+              width: 100%; /* FIXED: Full width */
+              max-width: 400px; /* FIXED: Match input width */
             }
             
             @keyframes slideIn {
@@ -552,9 +582,11 @@
               margin-bottom: 20px;
             }
 
+            /* MOBILE OPTIMIZATIONS */
             @media (max-width: 600px) {
               .quiz-container {
                 padding: 15px;
+                padding-bottom: 60px; /* FIXED: More bottom padding on mobile for keyboard */
               }
               
               .question-card {
@@ -567,6 +599,37 @@
               
               .btn {
                 min-width: 100%;
+              }
+              
+              /* FIXED: Smaller unit circle on mobile to leave room for input */
+              .unit-circle-svg {
+                max-width: 200px;
+                height: 200px;
+                margin-bottom: 20px;
+              }
+              
+              /* FIXED: Reduce progress bar height on mobile */
+              .progress-bar {
+                height: 45px;
+              }
+              
+              /* FIXED: Make sure input doesn't get too small */
+              .answer-input {
+                font-size: 1.1rem;
+                padding: 16px 20px;
+              }
+            }
+
+            /* EXTRA SMALL SCREENS */
+            @media (max-width: 400px) {
+              .progress-fill {
+                font-size: 0.75rem; /* FIXED: Even smaller text for very small screens */
+                padding: 0 8px;
+              }
+              
+              .unit-circle-svg {
+                max-width: 180px;
+                height: 180px;
               }
             }
           `}</style>
@@ -620,7 +683,7 @@
                       className="progress-fill"
                       style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                     >
-                      {currentQuestionIndex + 1} / {questions.length}
+                      {currentQuestionIndex + 1}/{questions.length}
                     </div>
                   </div>
 
@@ -651,9 +714,6 @@
                             autoFocus
                           />
                         </div>
-                        
-                        
-
                       </>
                     )}
 
@@ -762,6 +822,15 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<UnitCircleQuiz />);
+  </script>
+  
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.log('Service Worker registration failed'));
+    }
   </script>
 </body>
 </html>
